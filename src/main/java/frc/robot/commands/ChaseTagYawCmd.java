@@ -26,12 +26,14 @@ public class ChaseTagYawCmd extends CommandBase {
   @Override
   public void execute() {
     System.out.println("CHASE TAG CMD EXECUTING!");
-  //  driveSubsystem.aprilDrive(visionSubsystem.getBestTarget().getYaw(), 0);
+    driveSubsystem.aprilDrive(visionSubsystem.getBestTargetYaw(), 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    driveSubsystem.stopDrive();
+  }
 
   // Returns true when the command should end.
   @Override

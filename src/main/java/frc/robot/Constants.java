@@ -16,13 +16,13 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
  */
 public final class Constants {
     public static final class DriveConstants {
-        public static final int LEFT_MOTOR_PIN_1 = 6;
-        public static final int LEFT_MOTOR_PIN_2 = 5;
-        public static final int LEFT_MOTOR_PIN_3 = 7;
+        public static final int LEFT_MOTOR_PIN_1 = 1;
+        public static final int LEFT_MOTOR_PIN_2 = 2;
+        public static final int LEFT_MOTOR_PIN_3 = 3;
     
-        public static final int RIGHT_MOTOR_PIN_1 = 1;
-        public static final int RIGHT_MOTOR_PIN_2 = 31;
-        public static final int RIGHT_MOTOR_PIN_3 = 3;
+        public static final int RIGHT_MOTOR_PIN_1 = 4;
+        public static final int RIGHT_MOTOR_PIN_2 = 5;
+        public static final int RIGHT_MOTOR_PIN_3 = 6;
     
         public static final double GYRO_KP = 0.0018;
         public static final double GYRO_KI = 0;

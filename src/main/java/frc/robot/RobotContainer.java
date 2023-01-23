@@ -40,7 +40,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(joystick, 1).whileActiveContinuous(new ChaseTagYawCmd(driveSubsystem, visionSubsystem));
+    new JoystickButton(joystick, 1).whileTrue(new ChaseTagYawCmd(driveSubsystem, visionSubsystem).until(()->!joystick.getRawButton(1)));
   }
 
   /**

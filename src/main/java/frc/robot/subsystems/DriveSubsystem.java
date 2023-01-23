@@ -38,7 +38,7 @@ public class DriveSubsystem extends SubsystemBase {
     // Differential
     private final DifferentialDrive differentialDrive = new DifferentialDrive(leftGroup, rightGroup);
 
-    public ProfiledPIDController yawPidController = new ProfiledPIDController(1.5 , 0, 0.05, new TrapezoidProfile.Constraints(3, 3));
+    public ProfiledPIDController yawPidController = new ProfiledPIDController(0.04 , 0, 0.02, new TrapezoidProfile.Constraints(3, 3));
 
         // Filters
         private final SlewRateLimiter linearLimiter = new SlewRateLimiter(2.5);
@@ -49,11 +49,14 @@ public class DriveSubsystem extends SubsystemBase {
 /** Creates a new DriveSubsystem. */
  public DriveSubsystem(Joystick joystick) {
   this.joystick = joystick;
-    yawPidController.setTolerance(3);
+    yawPidController.setTolerance(1.5);
+    //yawPidController.enableContinuousInput(0.2, 0.7);
+    rightGroup.setInverted(true);
  }
 
 @Override
 public void periodic() {
+ 
     SmartDashboard.putNumber("Navx Yaw :", navx.getYaw());
 }
 
@@ -63,7 +66,8 @@ public void arcadeDrive(){
 }
 
 public void aprilDrive(double currentYaw, double targetYaw){
-  differentialDrive.arcadeDrive(0, yawPidController.calculate(currentYaw, targetYaw));
+  
+  differentialDrive.arcadeDrive(0,angularLimiter.calculate(yawPidController.calculate(currentYaw, targetYaw)));
 }
 
 public void resetNavX(){
