@@ -5,8 +5,6 @@
 package frc.robot.subsystems;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +23,15 @@ public class VisionSubsystem extends SubsystemBase {
     return 0;
   }
 
+  public double getBestXTarget(){
+    try{
+      return camera.getLatestResult().getBestTarget().getBestCameraToTarget().getX();
+    }catch(Exception exception){
+      exception.printStackTrace();
+    }
+    return 0;
+  }
+
   @Override
   public void periodic() {
     // try {
@@ -35,6 +42,7 @@ public class VisionSubsystem extends SubsystemBase {
     // }
     try {
         SmartDashboard.putNumber("APril Tag Yaw :", camera.getLatestResult().getBestTarget().getYaw());
+        SmartDashboard.putNumber("Get best target id :", camera.getLatestResult().getBestTarget().getFiducialId());
     } catch (Exception e) {
         // TODO: handle exception
     }

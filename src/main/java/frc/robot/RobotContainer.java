@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.ArcadeDriveCmd;
+import frc.robot.commands.ChaseTagCmd;
+import frc.robot.commands.ChaseTagXCmd;
 import frc.robot.commands.ChaseTagYawCmd;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -29,6 +32,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    driveSubsystem.setDefaultCommand(new ArcadeDriveCmd(driveSubsystem));
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -40,7 +44,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(joystick, 1).whileTrue(new ChaseTagYawCmd(driveSubsystem, visionSubsystem).until(()->!joystick.getRawButton(1)));
+    new JoystickButton(joystick, 1).whileTrue(new ChaseTagCmd(driveSubsystem, visionSubsystem).until(()->!joystick.getRawButton(1)));
   }
 
   /**

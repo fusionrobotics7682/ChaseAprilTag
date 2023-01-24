@@ -38,7 +38,8 @@ public class DriveSubsystem extends SubsystemBase {
     // Differential
     private final DifferentialDrive differentialDrive = new DifferentialDrive(leftGroup, rightGroup);
 
-    public ProfiledPIDController yawPidController = new ProfiledPIDController(0.04 , 0, 0.02, new TrapezoidProfile.Constraints(3, 3));
+    private  ProfiledPIDController yawPidController = new ProfiledPIDController(0.0240 , 0.03, 0.001, new TrapezoidProfile.Constraints(3, 3));
+    private ProfiledPIDController xPidController = new ProfiledPIDController(0.270, 0.07, 0.001, new TrapezoidProfile.Constraints(3, 3));
 
         // Filters
         private final SlewRateLimiter linearLimiter = new SlewRateLimiter(2.5);
@@ -49,7 +50,7 @@ public class DriveSubsystem extends SubsystemBase {
 /** Creates a new DriveSubsystem. */
  public DriveSubsystem(Joystick joystick) {
   this.joystick = joystick;
-    yawPidController.setTolerance(1.5);
+    //yawPidController.setTolerance(1.5);
     //yawPidController.enableContinuousInput(0.2, 0.7);
     rightGroup.setInverted(true);
  }
@@ -65,9 +66,9 @@ public void arcadeDrive(){
  differentialDrive.arcadeDrive(linearLimiter.calculate(-joystick.getRawAxis(1)), angularLimiter.calculate(joystick.getRawAxis(2)*0.7)); // lineer, rotation
 }
 
-public void aprilDrive(double currentYaw, double targetYaw){
-  
-  differentialDrive.arcadeDrive(0,angularLimiter.calculate(yawPidController.calculate(currentYaw, targetYaw)));
+public void aprilDrive(double currentX, double currentYaw){
+  System.out.print("Current April Tag Yaw :"+currentYaw);
+  differentialDrive.arcadeDrive(xPidController.calculate(currentX, 0.8),yawPidController.calculate(currentYaw, 0));
 }
 
 public void resetNavX(){
