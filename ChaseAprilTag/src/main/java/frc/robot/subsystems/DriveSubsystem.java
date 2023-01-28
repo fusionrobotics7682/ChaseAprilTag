@@ -7,12 +7,17 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -30,19 +35,15 @@ public class DriveSubsystem extends SubsystemBase {
     WPI_VictorSPX rightMotor1 = new WPI_VictorSPX(Constants.DriveConstants.RIGHT_MOTOR_PIN_1);
     WPI_VictorSPX rightMotor2 = new WPI_VictorSPX(Constants.DriveConstants.RIGHT_MOTOR_PIN_2);
     WPI_VictorSPX rightMotor3 = new WPI_VictorSPX(Constants.DriveConstants.RIGHT_MOTOR_PIN_3);
-    
 
     // Groups
     MotorControllerGroup leftGroup = new MotorControllerGroup(leftMotor1, leftMotor2, leftMotor3);
     MotorControllerGroup rightGroup = new MotorControllerGroup(rightMotor1, rightMotor2, rightMotor3);
 
     // Differential
-    private final DifferentialDrive differentialDrive = new DifferentialDrive(leftGroup, rightGroup);
-
-    private ProfiledPIDController yawPidController =
-     new ProfiledPIDController(0.0230 , 0.03, 0.0025, new TrapezoidProfile.Constraints(3, 3));
-    private ProfiledPIDController xPidController =
-     new ProfiledPIDController(2.5, 0.075, 0.005, new TrapezoidProfile.Constraints(3.25, 2.5));
+    private DifferentialDrive differentialDrive = new DifferentialDrive(leftGroup, rightGroup);
+    private DifferentialDrivePoseEstimator differentialDrivePoseEstimator = new DifferentialDrivePoseEstimator(Constants.DriveConstants.DIFFERENTIAL_DRIVE_KINEMATICS, new Rotation2d(), 0, 0, new Pose2d());
+    private Field2d field2d = new Field2d();
 
         // Filters
         private final SlewRateLimiter linearLimiter = new SlewRateLimiter(4.5);
@@ -50,31 +51,29 @@ public class DriveSubsystem extends SubsystemBase {
 
     Joystick joystick;
 
-/** Creates a new DriveSubsystem. */
- public DriveSubsystem(Joystick joystick) {
-  this.joystick = joystick;
-    yawPidController.setTolerance(1.5);
-    xPidController.setTolerance(0.05);
+    private final VisionSubsystem visionSubsystem;
 
-    differentialDrive.setMaxOutput(0.7);
-  //  yawPidController.enableContinuousInput(-0.7, 0.7);
-//    xPidController.enableContinuousInput(-0.7, 0.7);
-    rightGroup.setInverted(true);
+/** Creates a new DriveSubsystem. */
+ public DriveSubsystem(Joystick joystick, VisionSubsystem visionSubsystem) {
+  this.visionSubsystem = visionSubsystem;
+  this.joystick = joystick;
+  rightGroup.setInverted(true);
  }
 
 @Override
-public void periodic() {
+public void periodic() {  
+  differentialDrivePoseEstimator.addVisionMeasurement(visionSubsystem.getTargetPose2d(), Timer.getFPGATimestamp());
+
+  SmartDashboard.putNumber("estimation x:", differentialDrivePoseEstimator.getEstimatedPosition().getX());
+  SmartDashboard.putNumber("estimation y:", differentialDrivePoseEstimator.getEstimatedPosition().getY());
+  SmartDashboard.putNumber("estimation degrees:", differentialDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees());
+  //SmartDashboard.putData(field2d);
   SmartDashboard.putNumber("Navx Yaw :", navx.getYaw());
 }
 
 public void arcadeDrive(){
   // Will be add filters
- differentialDrive.arcadeDrive(linearLimiter.calculate(joystick.getRawAxis(1)), -angularLimiter.calculate(joystick.getRawAxis(2)*0.7)); // lineer, rotation
-}
-
-public void aprilDrive(double currentX, double currentYaw){
-  System.out.print("Current April Tag Yaw :"+currentYaw);
-  differentialDrive.arcadeDrive(linearLimiter.calculate(xPidController.calculate(currentX, 1)*0.6),yawPidController.calculate(currentYaw, 0));
+ differentialDrive.arcadeDrive(linearLimiter.calculate(joystick.getY()), -angularLimiter.calculate(joystick.getZ()*0.7)); // lineer, rotation
 }
 
 public void resetNavX(){

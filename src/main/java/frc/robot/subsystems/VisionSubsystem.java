@@ -42,7 +42,10 @@ public class VisionSubsystem extends SubsystemBase {
     // }
     try {
         SmartDashboard.putNumber("APril Tag Yaw :", camera.getLatestResult().getBestTarget().getYaw());
-        SmartDashboard.putNumber("Get best target id :", camera.getLatestResult().getBestTarget().getFiducialId());
+        //SmartDashboard.putNumber("Get best target id :", camera.getLatestResult().getBestTarget().getFiducialId());
+        SmartDashboard.putNumber("X :", camera.getLatestResult().getBestTarget().getBestCameraToTarget().getX());
+        SmartDashboard.putNumber("Y :", camera.getLatestResult().getBestTarget().getBestCameraToTarget().getY());
+        SmartDashboard.putNumber("Z :", camera.getLatestResult().getBestTarget().getBestCameraToTarget().getZ());
     } catch (Exception e) {
         // TODO: handle exception
     }
